@@ -81,17 +81,6 @@ public class Main {
 
 		 sumOfUsersWithPassLevel.forEach((k, v) -> 
 			System.out.println("level of pass " + k + " nr of users with pass " + v));
-	
-	MessageDigest md = MessageDigest.getInstance("MD5");
-	for(int i=0; i<users.size(); i++){
-		md.update(users.get(i).getPassword().getBytes());
-	}
-	byte byteData[] = md.digest();
-
-	StringBuffer sb = new StringBuffer();
-	for (int i = 0; i < byteData.length; i++) {
-	  sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-	}
 	        
 	ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("user_data.txt"));
 	oos.writeObject(users);
@@ -101,6 +90,7 @@ public class Main {
 	List<User> readed = (List<User>) ois.readObject();
 	ois.close();
 	
+	System.out.println("\n");
 	readed.forEach(System.out::println);
 }
 }
