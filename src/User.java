@@ -1,23 +1,18 @@
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Base64;
+//import org.apache.commons.codec.digest.DigestUtils;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import javax.crypto.*;
+import sun.misc.*;
 
 public class User implements Serializable{
 	/*
@@ -30,6 +25,9 @@ public class User implements Serializable{
 		 * (wykorzystaj: serializable, writeObject, readObject (metody
 		 * prywatne), oraz slowko: transient
 	 */
+	private static final byte[] keyValue =  new byte[] { 'T', 'h', 'e', 'B', 'e', 's', 't',
+	'S', 'e', 'c', 'r','e', 't', 'K', 'e', 'y' };
+	private static final String ALGO = "AES";
 	private String login;
 	private String password;
 	
@@ -54,31 +52,44 @@ public class User implements Serializable{
 		this.password = password;
 	}
 
-	private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException, NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("MD5");
-		md.update(getPassword().getBytes());
-		byte byteData[] = md.digest();
-
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < byteData.length; i++) {
-		  sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-		}
+	private void writeObject(ObjectOutputStream out) throws Exception{
 		out.defaultWriteObject();
 		out.writeObject(getLogin());
-		out.writeObject(sb.toString());
+		out.writeObject(encrypt(getPassword()));
 	}
 
-	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException, NoSuchAlgorithmException {
-		
-        MessageDigest md = MessageDigest.getInstance("MD5");
-   		byte[] byteData = md.digest();
-
-   //     String str = Base64.encodeBase64String(byteData);
-           
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException{
 		in.defaultReadObject();
 		setLogin((String) in.readObject());
-		setPassword((String) in.readObject());
+		try {
+			setPassword((String) decrypt(String.valueOf(in.readObject())));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+	//http://www.code2learn.com/2011/06/encryption-and-decryption-of-data-using.html
+	public static String encrypt(String Data) throws Exception {
+        Key key = generateKey();
+        Cipher c = Cipher.getInstance(ALGO);
+        c.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encVal = c.doFinal(Data.getBytes());
+        String encryptedValue = new BASE64Encoder().encode(encVal);
+        return encryptedValue;
+    }
+    public static String decrypt(String encryptedData) throws Exception {
+        Key key = generateKey();
+        Cipher c = Cipher.getInstance(ALGO);
+        c.init(Cipher.DECRYPT_MODE, key);
+        byte[] decordedValue = new BASE64Decoder().decodeBuffer(encryptedData);
+        byte[] decValue = c.doFinal(decordedValue);
+        String decryptedValue = new String(decValue);
+        return decryptedValue;
+    }
+    private static Key generateKey() throws Exception {
+        Key key = new SecretKeySpec(keyValue, ALGO);
+        return key;
+    }
 
 	@Override
 	public int hashCode() {

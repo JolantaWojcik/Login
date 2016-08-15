@@ -59,6 +59,8 @@ public class Main {
 		System.out.println("length of pass " + k + " nr of users with pass " + v));
 		System.out.println("\n");
 			
+		//metod !Character.isLetter(ch) to sprawdzasz tylko bie¿¹cy znak z has³a - bez wiedzy o poprzednich czy nastepnych
+		//a to trzeba najpierw przeanalizowaæ cale haslo a dopiero potem je ocenic
 		String passDifficultyLevel =null;
 		List<String> passwords = new ArrayList<>();
 		for (User u: users){
