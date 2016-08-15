@@ -1,9 +1,23 @@
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Base64;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 
 public class User implements Serializable{
 	/*
@@ -55,20 +69,12 @@ public class User implements Serializable{
 	}
 
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException, NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("MD5");
-	//	md.update(getPassword().getBytes());
-		 byte[] dataBytes = new byte[1024];
-		 int nread = 0;
-	      while ((nread = in.read(dataBytes)) != -1) {
-	          md.update(dataBytes, 0, nread);
-	        };
-	        byte[] mdbytes = md.digest();
+		
+        MessageDigest md = MessageDigest.getInstance("MD5");
+   		byte[] byteData = md.digest();
 
-	        //convert the byte to hex format method 1
-	        StringBuffer sb = new StringBuffer();
-	        for (int i = 0; i < mdbytes.length; i++) {
-	          sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
-	        }
+   //     String str = Base64.encodeBase64String(byteData);
+           
 		in.defaultReadObject();
 		setLogin((String) in.readObject());
 		setPassword((String) in.readObject());

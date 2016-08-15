@@ -41,6 +41,10 @@ public class Main {
 		System.out.println(users.toString());
 		
 		Map<Integer, Integer> sumOfUsersWithPassLength = new HashMap<>();
+		//nie udalo sie 
+		//Map<Integer, Integer> sumOfUsersWithPassLength = passwords.stream().collect(
+        //Collectors.groupingBy(User::getPassword.length(), Collectors.counting()));
+		//czy jest mozliwe User::getPassword.length()???
 		int passLength = 0;
 		for (User u: users){
 			passLength = u.getPassword().length();
