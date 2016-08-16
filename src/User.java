@@ -58,15 +58,10 @@ public class User implements Serializable{
 		out.writeObject(encrypt(getPassword()));
 	}
 
-	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream in) throws Exception, IOException, ClassNotFoundException{
 		in.defaultReadObject();
 		setLogin((String) in.readObject());
-		try {
-			setPassword((String) decrypt(String.valueOf(in.readObject())));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		setPassword((String) decrypt(String.valueOf(in.readObject())));
 	}
 	//http://www.code2learn.com/2011/06/encryption-and-decryption-of-data-using.html
 	public static String encrypt(String Data) throws Exception {

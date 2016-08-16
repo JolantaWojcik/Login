@@ -8,7 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import sun.rmi.runtime.Log;
 
 public class Main {
 	/*
@@ -64,20 +68,27 @@ public class Main {
 		String passDifficultyLevel =null;
 		List<String> passwords = new ArrayList<>();
 		for (User u: users){
-			   for (int i=1; i<u.getPassword().length(); i++)
-               {
-                  char ch = u.getPassword().charAt(i);
-
-                  if(u.getPassword().length()<=5 && Character.isLowerCase(ch) && Character.isLetter(ch)){
+			   for (int i=1; i<u.getPassword().length(); i++){
+				   
+                  if(u.getPassword().length()<=5 && containsNumbers(u.getPassword())==false
+                		  &&containsLoweCaseLetters(u.getPassword())==true){
                 	  passDifficultyLevel = "easy";
+                	  System.out.println("**easy** " + u.getPassword().toString());
                   }
                   //srednie: ma powyzej 5 znakow i litery lub cyfry
-                  else if(u.getPassword().length()>=5 && u.getPassword().length()<8 && !Character.isLetter(ch)){
+                  else if(u.getPassword().length()>=5 && containsSpecialCharacters(u.getPassword())==false){
                 	  passDifficultyLevel = "middle";
+                	  System.out.println("**middle** " + u.getPassword().toString());
                   }
                // trudne: ma powyzej 8 znakow i ma litery cyfry lub znaki
-                  else if(u.getPassword().length()>=8 && !Character.isLetter(ch)){
+                //problem z **unknown pass** asd.zxc
+                  //lub z **hard** Asd.zxc55! wiêc "||" zamiast "&&"
+                  else if(u.getPassword().length()>=8 || containsSpecialCharacters(u.getPassword())==true){
                 	  passDifficultyLevel = "hard";
+                	  System.out.println("**hard** " + u.getPassword().toString());
+                  }else{
+                	  passDifficultyLevel = "**unknown**";
+                	  System.out.println("**unknown pass** " + u.getPassword().toString());
                   }
                }
 			   passwords.add(passDifficultyLevel);
@@ -99,4 +110,35 @@ public class Main {
 	System.out.println("\n");
 	readed.forEach(System.out::println);
 }
+	
+	public final static boolean containsNumbers(String s) {
+		 Pattern p = Pattern.compile(".*[0-9].*");
+	     Matcher m = p.matcher(s);
+	    if (s != null && !s.isEmpty()) {if (m.find()) {
+	                return true;
+	            }
+	    }
+	    return false;
+	}
+	public final static boolean containsLoweCaseLetters(String s) {
+	    if (s != null && !s.isEmpty()) {
+	        for (char c : s.toCharArray()) {
+	            if (Character.isLowerCase(c)) {
+	                return true;
+	            }
+	        }
+	    }
+	    return false;
+	}
+	//Character.isSpaceChar(c)
+	public final static boolean containsSpecialCharacters(String s) {
+		 Pattern p = Pattern.compile("[\\p{Alpha}]*[\\p{Punct}][\\p{Alpha}]*");
+	     Matcher m = p.matcher(s);
+	    if (s != null && !s.isEmpty()) {
+	            if (m.find()) {
+	                return true;
+	            }
+	    }
+	    return false;
+	}
 }
